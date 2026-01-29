@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- En-tête du métier -->
+            <div class="pb-3 mb-4 border-bottom">
+                <h1 class="display-5 fw-bold">{{ job.title }}</h1>
+                <p class="fs-5 text-muted">Salaire estimé : {{ job.salary_min }}€ - {{ job.salary_max }}€ par an</p>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <h3 class="h4">Description du poste</h3>
+                <p>{{ job.description|linebreaksbr }}</p>
+            </div>
+
+            <!-- Compétences et Intérêts -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h3 class="h4">Compétences requises</h3>
+                    <ul class="list-group">
+                        {% for skill in job.required_skills.all %}
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill text-success me-2"></i>{{ skill.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h3 class="h4">Intérêts pertinents</h3>
+                    <ul class="list-group">
+                        {% for interest in job.relevant_interests.all %}
+                            <li class="list-group-item"><i class="bi bi-heart-fill text-danger me-2"></i>{{ interest.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <a href="{% url 'profiles:recommendations' %}" class="btn btn-outline-secondary mt-3">
+                <i class="bi bi-arrow-left me-2"></i>Retour aux recommandations
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

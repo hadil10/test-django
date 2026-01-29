@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Gérer mes Fiches de Poste{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- En-tête de la page -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <h1 class="h2">Mes Fiches de Poste</h1>
+        <!-- CORRIGÉ : 'job-create' est dans le namespace 'companies' -->
+        <a href="{% url 'companies:job-create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Créer une nouvelle fiche
+        </a>
+    </div>
+
+    {% if job_postings %}
+        <!-- Boucle sur chaque fiche de poste pour créer une carte -->
+        {% for job in job_postings %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <!-- Colonne pour le titre et les informations -->
+                    <div class="col-md-8">
+                        <h5 class="card-title mb-1">
+                            <!-- CORRIGÉ : 'job-detail' est dans le namespace 'profiles' -->
+                            <a href="{% url 'profiles:job-detail' job.id %}" class="text-decoration-none" style="color: var(--primary-violet);">{{ job.title }}</a>
+                        </h5>
+                        <small class="text-muted">
+                            Publié le {{ job.created_at|date:"d F Y" }}
+                        </small>
+                        <div class="mt-2">
+                            <span class="badge text-bg-light border me-2">
+                                <i class="bi bi-tags-fill me-1"></i>
+                                {{ job.required_skills.count }} compétence(s) requise(s)
+                            </span>
+                            <span class="badge text-bg-light border">
+                                <i class="bi bi-heart-fill me-1"></i>
+                                {{ job.relevant_interests.count }} intérêt(s) pertinent(s)
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Colonne pour les actions -->
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <!-- CORRIGÉ : 'job-update' est dans le namespace 'companies' -->
+                        <a href="{% url 'companies:job-update' job.id %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-pencil-fill"></i> Modifier
+                        </a>
+                        <!-- CORRIGÉ : 'job-delete' est dans le namespace 'companies' -->
+                        <a href="{% url 'companies:job-delete' job.id %}" class="btn btn-outline-danger btn-sm ms-2">
+                            <i class="bi bi-trash-fill"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- Message si aucune fiche de poste n'a été créée -->
+        <div class="text-center py-5 bg-light rounded">
+            <i class="bi bi-file-earmark-text-fill display-4 text-muted"></i>
+            <p class="lead mt-3">Vous n'avez encore publié aucune fiche de poste.</p>
+            <!-- CORRIGÉ : 'job-create' est dans le namespace 'companies' -->
+            <a href="{% url 'companies:job-create' %}" class="btn btn-primary mt-2">Créer ma première fiche</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

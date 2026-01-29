@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Questionnaire - Centres d'Intérêt{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="col-lg-8 mx-auto">
+        <h1 class="mb-4">Évaluation de vos Centres d'Intérêt</h1>
+        <p class="lead mb-4">Pour chaque centre d'intérêt, indiquez votre niveau d'intérêt de 1 (Peu d'intérêt) à 5 (Très intéressé).</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    {% for interest in interests %}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">{{ interest.name }}</label>
+                            <div class="d-flex justify-content-between">
+                                {% for level, description in levels.items %}
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="interest_{{ interest.id }}" id="interest_{{ interest.id }}_{{ level }}" value="{{ level }}" {% if existing_evaluations|get_item:interest.id == level %}checked{% endif %}>
+                                        <label class="form-check-label" for="interest_{{ interest.id }}_{{ level }}">{{ level }}  
+<small class="text-muted">{{ description }}</small></label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg mt-4">Enregistrer mes évaluations</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

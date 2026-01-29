@@ -1,0 +1,46 @@
+{% extends 'base.html' %} 
+
+{% block title %}Mes Recommandations{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="col-lg-9 mx-auto">
+        <h1 class="text-center mb-2" style="color: var(--primary-violet); font-weight: 600;">Vos Recommandations de Carrière</h1>
+        <p class="lead text-center text-muted mb-5">Basé sur vos compétences et vos intérêts, voici les métiers qui pourraient vous correspondre.</p>
+
+        {% if recommendations %}
+            {% for item in recommendations %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-9">
+                                <h4 class="card-title" style="color: var(--primary-violet);">{{ item.job.title }}</h4>
+                                <p class="card-text text-muted">{{ item.job.description|truncatewords:30 }}</p>
+                                {% if item.job.salary_min and item.job.salary_max %}
+                                    <p class="mb-0"><strong>Salaire estimé :</strong> {{ item.job.salary_min }}€ - {{ item.job.salary_max }}€ / an</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 text-center mt-3 mt-md-0">
+                                <h5>Score de compatibilité</h5>
+                                <p class="display-5 fw-bold" style="color: var(--primary-violet);">{{ item.score }}%</p>
+                                <div class="text-muted small">
+                                <p class="mb-0">Compétences : {{ item.skill_score }}%</p>
+                                <p class="mb-0">Intérêts : {{ item.interest_score }}%</p>
+                                </div>
+                                <a href="{% url 'profiles:job-detail' item.job.id %}" class="btn btn-primary btn-sm">En savoir plus</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-warning text-center" role="alert">
+                <h4 class="alert-heading">Pas assez d'informations !</h4>
+                <p>Nous ne pouvons pas encore vous fournir de recommandations. Veuillez d'abord remplir le questionnaire d'évaluation.</p>
+                <hr>
+                <a href="{% url 'profiles:questionnaire' %}" class="btn btn-primary">Remplir le questionnaire</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

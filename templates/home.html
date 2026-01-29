@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Accueil{% endblock %}
+
+
+{% block content %}
+
+
+    <!-- ===================================== -->
+    <!-- SECTION HÉROS (HERO SECTION)          -->
+    <!-- ===================================== -->
+    <header class="py-5" style="background: linear-gradient(120deg, var(--primary-violet), #a98eda);">
+        <div class="container text-center text-white py-5">
+            <h1 class="display-4 fw-bold">Trouvez votre voie. Révélez votre potentiel.</h1>
+            <p class="lead my-4">FutureCareer utilise l'intelligence artificielle pour vous aider à choisir une orientation professionnelle adaptée à vos compétences et vos passions.</p>
+            <!-- CORRIGÉ : 'recommendations' est maintenant dans le namespace 'profiles' -->
+            <a href="{% url 'profiles:recommendations' %}" class="btn btn-light btn-lg fw-bold px-4">Découvrir mes recommandations</a>
+        </div>
+    </header>
+
+
+    <!-- ===================================== -->
+    <!-- SECTION DES FONCTIONNALITÉS           -->
+    <!-- ===================================== -->
+    <section class="container my-5 py-5">
+        <div class="text-center">
+            <h2 class="mb-5">Comment ça marche ?</h2>
+        </div>
+        <div class="row">
+            <!-- Fonctionnalité 1 -->
+            <div class="col-md-4 text-center">
+                <div style="font-size: 3rem; color: var(--primary-violet);">💡</div>
+                <h3 class="h5 fw-bold mt-3">1. Évaluez-vous</h3>
+                <p class="text-muted">Remplissez notre questionnaire rapide pour nous parler de vos compétences et de vos centres d'intérêt.</p>
+            </div>
+            <!-- Fonctionnalité 2 -->
+            <div class="col-md-4 text-center">
+                <div style="font-size: 3rem; color: var(--primary-violet);">🎯</div>
+                <h3 class="h5 fw-bold mt-3">2. Obtenez vos résultats</h3>
+                <p class="text-muted">Notre algorithme analyse vos réponses et calcule votre compatibilité avec des dizaines de métiers.</p>
+            </div>
+            <!-- Fonctionnalité 3 -->
+            <div class="col-md-4 text-center">
+                <div style="font-size: 3rem; color: var(--primary-violet);">🚀</div>
+                <h3 class="h5 fw-bold mt-3">3. Explorez votre avenir</h3>
+                <p class="text-muted">Découvrez les carrières qui vous correspondent le mieux, les salaires et les formations associées.</p>
+            </div>
+        </div>
+    </section>
+
+
+{% endblock content %}

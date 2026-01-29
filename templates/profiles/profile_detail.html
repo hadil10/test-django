@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon Profil - {{ user.username }}{% endblock %}
+
+{% block content %}
+    <header class="py-5 text-center text-white" style="background: linear-gradient(120deg, var(--primary-violet), #a98eda);">
+        <div class="container">
+            <h1 class="fw-bold">Profil de {{ user.username }}</h1>
+            <p class="lead">{{ user.email }}</p>
+        </div>
+    </header>
+
+    <main class="container my-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">Biographie</h5>
+                        <p class="card-text">{{ profile.bio|default:"Aucune biographie pour le moment." }}</p>
+                    </div>
+                   
+                    <div class="card-footer bg-light text-center p-3">
+                        <a href="{% url 'profiles:profile-update' %}" class="btn btn-primary">Modifier le profil</a>
+                        <a href="{% url 'profiles:questionnaire' %}" class="btn btn-secondary ms-2">Évaluer mes compétences & Intérêts</a>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">Mon Curriculum Vitae</h5>
+                        
+                        {% if profile.cv %}
+                            <p>
+                                <a href="{{ profile.cv.url }}" class="btn btn-outline-primary" target="_blank">
+                                    <i class="bi bi-file-earmark-person-fill me-2"></i>
+                                    Voir mon CV
+                                </a>
+                            </p>
+                            <small class="text-muted">
+                                Pour mettre à jour votre CV, veuillez en téléverser un nouveau via le formulaire de modification.
+                            </small>
+
+                        {% else %}
+                            <p class="text-muted">Vous n'avez pas encore téléchargé de CV.</p>
+                            <a href="{% url 'profiles:profile-update' %}" class="btn btn-primary">Ajouter mon CV</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">Mon auto-évaluation des compétences</h5>
+                        {% for evaluation in profile.skill_evaluations.all %}
+                            <div class="mb-3">
+                                <strong>{{ evaluation.skill.name }}:</strong>
+                                <span class="text-primary fw-bold">{{ evaluation.get_level_display }}</span>
+                               <div class="progress mt-1" style="height: 10px;">
+                                   <div class="progress-bar" role="progressbar" style="width: {% widthratio evaluation.level 5 100 %}%" aria-valuenow="{{ evaluation.level }}" aria-valuemin="0" aria-valuemax="5"></div>
+                               </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">Vous n'avez pas encore évalué vos compétences.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">Mon évaluation des centres d'intérêt</h5>
+                        {% for evaluation in profile.interest_evaluations.all %}
+                            <div class="mb-3">
+                                <strong>{{ evaluation.interest.name }}:</strong>
+                                <span class="text-success fw-bold">{{ evaluation.get_level_display }}</span>
+                                <div class="progress mt-1" style="height: 10px;">
+                                   <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio evaluation.level 5 100 %}%" aria-valuenow="{{ evaluation.level }}" aria-valuemin="0" aria-valuemax="5"></div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">Vous n'avez pas encore évalué vos centres d'intérêt.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+{% endblock content %}

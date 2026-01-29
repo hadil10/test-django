@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de Bord - {{ company.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- En-tête de la page -->
+    <div class="pb-3 mb-4 border-bottom">
+        <h1 class="h2">Tableau de Bord de <span style="color: var(--primary-violet );">{{ company.name }}</span></h1>
+    </div>
+
+    <!-- Alerte de statut du compte (pas de changement ici) -->
+    {% if not company.is_approved %}
+        <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <i class="bi bi-hourglass-split fs-4 me-3"></i>
+            <div>
+                <h5 class="alert-heading mb-1">Votre compte est en attente d'approbation</h5>
+                Vous ne pourrez pas publier de fiches de poste tant que notre équipe n'aura pas validé votre profil.
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+            <div>
+                <h5 class="alert-heading mb-1">Votre compte est approuvé !</h5>
+                Vous pouvez dès maintenant créer et gérer vos fiches de poste pour trouver les meilleurs talents.
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Section principale avec deux colonnes -->
+    <div class="row g-4 mt-3">
+
+        <!-- Colonne de gauche : Actions (CORRIGÉE) -->
+        <div class="col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-lightning-charge-fill me-2" style="color: var(--primary-violet);"></i>Actions Rapides</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <!-- CORRIGÉ : 'job-create' est dans le namespace 'companies' -->
+                    <a href="{% url 'companies:job-create' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not company.is_approved %}disabled{% endif %}">
+                        <span><i class="bi bi-plus-circle me-2"></i>Créer une fiche de poste</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <!-- CORRIGÉ : 'job-list' est dans le namespace 'companies' -->
+                    <a href="{% url 'companies:job-list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-collection me-2"></i>Gérer mes fiches de poste</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <!-- CORRIGÉ : Le lien pour modifier le profil de l'entreprise doit être créé -->
+                    <!-- Pour l'instant, nous le laissons en '#' en attendant de créer la vue et l'URL -->
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center disabled">
+                        <span><i class="bi bi-pencil-square me-2"></i>Modifier le profil</span>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne de droite : Informations (pas de changement ici) -->
+        <div class="col-lg-8">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="bi bi-building me-2" style="color: var(--primary-violet);"></i>Profil de l'Entreprise</h5>
+                </div>
+                <div class="card-body">
+                    {% if company.logo %}
+                        <img src="{{ company.logo.url }}" alt="Logo de {{ company.name }}" class="float-end ms-3 mb-3" style="max-width: 100px; border-radius: 8px;">
+                    {% endif %}
+                    <p><strong>Nom officiel :</strong> {{ company.name }}</p>
+                    <p><strong>Site web :</strong> <a href="{{ company.website }}" target="_blank">{{ company.website }} <i class="bi bi-box-arrow-up-right small"></i></a></p>
+                    <p class="mb-1"><strong>Description :</strong></p>
+                    <p class="text-muted">{{ company.description|linebreaksbr|default:"Aucune description fournie." }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
