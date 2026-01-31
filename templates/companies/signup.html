@@ -12,13 +12,10 @@
             <div class="card-body p-5">
                 <h1 class="card-title text-center mb-4">Rejoignez FutureCareer en tant qu'Entreprise</h1>
                 
-                <!-- AMÉLIORATION : Ajout d'un lien pour les utilisateurs existants -->
                 <p class="text-center text-muted mb-4">
                     Déjà un compte ? <a href="{% url 'user:login' %}">Connectez-vous</a>.
                 </p>
 
-                <!-- L'attribut novalidate désactive la validation HTML5 pour laisser Django la gérer -->
-                <!-- L'attribut enctype est nécessaire si vous ajoutez un champ de téléversement de fichier (logo) -->
                 <form method="post" novalidate enctype="multipart/form-data">
                     {% csrf_token %}
                     

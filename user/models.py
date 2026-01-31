@@ -1,11 +1,7 @@
-# user/models.py
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class CustomUser(AbstractUser):
-    # Ce modèle étend l'utilisateur de base de Django.
-    # Nous pourrons ajouter des champs ici plus tard si nécessaire.
     USER_TYPE_CHOICES = (
         ('student', 'Étudiant'),
         ('company', 'Entreprise'),

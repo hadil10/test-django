@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Candidats pour {{ offer.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'companies:dashboard' %}" class="btn btn-outline-secondary mb-4">&larr; Retour au tableau de bord</a>
+    
+    <h1 class="mb-2">Candidats pour l'offre : "{{ offer.title }}"</h1>
+    <p class="lead mb-4">Vous avez reçu {{ applicants.count }} candidature(s).</p>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {% if applicants %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nom du Candidat</th>
+                                <th scope="col">Date de Candidature</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applicants %}
+                                <tr>
+                                    <td>{{ application.student.user.get_full_name|default:application.student.user.username }}</td>
+                                    <td>{{ application.applied_at|date:"d/m/Y à H:i" }}</td>
+                                    <td>
+                  
+                                        <a href="{% url 'profiles:profile-detail-public' application.student.id %}" class="btn btn-primary btn-sm" target="_blank">Voir le Profil</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-center">Aucun candidat n'a encore postulé à cette offre.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

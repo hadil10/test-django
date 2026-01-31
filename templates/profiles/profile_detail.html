@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Mon Profil - {{ user.username }}{% endblock %}
+{% block title %}Profil de {{ profile.user.username }}{% endblock %}
 
 {% block content %}
-    <header class="py-5 text-center text-white" style="background: linear-gradient(120deg, var(--primary-violet), #a98eda);">
+  
+    <header class="py-5 text-center text-white" style="background: linear-gradient(120deg, #6f42c1, #a98eda);">
         <div class="container">
-            <h1 class="fw-bold">Profil de {{ user.username }}</h1>
-            <p class="lead">{{ user.email }}</p>
+            <h1 class="fw-bold">Profil de {{ profile.user.username }}</h1>
+            <p class="lead">{{ profile.user.email }}</p>
         </div>
     </header>
 
@@ -14,44 +15,57 @@
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 
+              
                 <div class="card shadow-sm mb-4">
                     <div class="card-body p-4">
                         <h5 class="card-title mb-3">Biographie</h5>
-                        <p class="card-text">{{ profile.bio|default:"Aucune biographie pour le moment." }}</p>
+                        <p class="card-text">{{ profile.bio|default:"Aucune biographie pour le moment."|linebreaks }}</p>
                     </div>
                    
-                    <div class="card-footer bg-light text-center p-3">
-                        <a href="{% url 'profiles:profile-update' %}" class="btn btn-primary">Modifier le profil</a>
-                        <a href="{% url 'profiles:questionnaire' %}" class="btn btn-secondary ms-2">Évaluer mes compétences & Intérêts</a>
-                    </div>
+                    <!-- ======================================================= -->
+                    <!-- SECTION DES BOUTONS D'ACTION (AVEC LOGIQUE D'AFFICHAGE) -->
+                    <!-- ======================================================= -->
+                    {% if user == profile.user %}
+                        <div class="card-footer bg-light text-center p-3">
+                            <a href="{% url 'profiles:profile-update' %}" class="btn btn-primary">Modifier le profil</a>
+                            
+                            
+                            <a href="{% url 'profiles:add-academic-result' %}" class="btn btn-info ms-2">Gérer mes résultats</a>
+                            
+                            <a href="{% url 'profiles:questionnaire' %}" class="btn btn-secondary ms-2">Évaluer mes compétences & Intérêts</a>
+                        </div>
+                    {% endif %}
                 </div>
+
 
                 <div class="card shadow-sm mb-4">
                     <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Mon Curriculum Vitae</h5>
-                        
+                        <h5 class="card-title mb-3">Curriculum Vitae</h5>
                         {% if profile.cv %}
                             <p>
                                 <a href="{{ profile.cv.url }}" class="btn btn-outline-primary" target="_blank">
                                     <i class="bi bi-file-earmark-person-fill me-2"></i>
-                                    Voir mon CV
+                                    Voir le CV
                                 </a>
                             </p>
-                            <small class="text-muted">
-                                Pour mettre à jour votre CV, veuillez en téléverser un nouveau via le formulaire de modification.
-                            </small>
-
+                            {% if user == profile.user %}
+                                <small class="text-muted">
+                                    Pour mettre à jour votre CV, veuillez en téléverser un nouveau via le formulaire de modification.
+                                </small>
+                            {% endif %}
                         {% else %}
-                            <p class="text-muted">Vous n'avez pas encore téléchargé de CV.</p>
-                            <a href="{% url 'profiles:profile-update' %}" class="btn btn-primary">Ajouter mon CV</a>
+                            <p class="text-muted">Aucun CV n'a été téléchargé.</p>
+                            {% if user == profile.user %}
+                                <a href="{% url 'profiles:profile-update' %}" class="btn btn-primary">Ajouter mon CV</a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
 
-
+              
                 <div class="card shadow-sm mb-4">
                     <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Mon auto-évaluation des compétences</h5>
+                        <h5 class="card-title mb-3">Auto-évaluation des compétences</h5>
                         {% for evaluation in profile.skill_evaluations.all %}
                             <div class="mb-3">
                                 <strong>{{ evaluation.skill.name }}:</strong>
@@ -61,24 +75,24 @@
                                </div>
                             </div>
                         {% empty %}
-                            <p class="text-muted">Vous n'avez pas encore évalué vos compétences.</p>
+                            <p class="text-muted">Aucune compétence n'a encore été évaluée.</p>
                         {% endfor %}
                     </div>
                 </div>
 
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Mon évaluation des centres d'intérêt</h5>
+                        <h5 class="card-title mb-3">Évaluation des centres d'intérêt</h5>
                         {% for evaluation in profile.interest_evaluations.all %}
                             <div class="mb-3">
                                 <strong>{{ evaluation.interest.name }}:</strong>
-                                <span class="text-success fw-bold">{{ evaluation.get_level_display }}</span>
+                                <span class="text-success fw-bold">{{ evaluation.get_level_display }}</span>  
                                 <div class="progress mt-1" style="height: 10px;">
-                                   <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio evaluation.level 5 100 %}%" aria-valuenow="{{ evaluation.level }}" aria-valuemin="0" aria-valuemax="5"></div>
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio evaluation.level 5 100 %}%" aria-valuenow="{{ evaluation.level }}" aria-valuemin="0" aria-valuemax="5"></div>
                                 </div>
                             </div>
                         {% empty %}
-                            <p class="text-muted">Vous n'avez pas encore évalué vos centres d'intérêt.</p>
+                            <p class="text-muted">Aucun centre d'intérêt n'a encore été évalué.</p>
                         {% endfor %}
                     </div>
                 </div>

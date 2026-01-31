@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ offer.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            
+           
+            <a href="{% url 'profiles:job-offer-list' %}" class="btn btn-outline-secondary mb-4">
+                <i class="bi bi-arrow-left"></i>
+                Retour à toutes les offres
+            </a>
+
+            <div class="card shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        {% if offer.company.logo %}
+                            <img src="{{ offer.company.logo.url }}" alt="Logo de {{ offer.company.name }}" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                        {% endif %}
+                        <div>
+                            <h1 class="card-title h2 mb-1">{{ offer.title }}</h1>
+                            <h2 class="h5 text-muted">{{ offer.company.name }}</h2>
+                        </div>
+                    </div>
+
+                  
+                    <div class="mb-4">
+                        <span class="badge fs-6 bg-primary-subtle text-primary-emphasis rounded-pill me-2">
+                            <i class="bi bi-briefcase-fill me-1"></i>
+                            {{ offer.get_offer_type_display }}
+                        </span>
+                        <span class="badge fs-6 bg-secondary-subtle text-secondary-emphasis rounded-pill">
+                            <i class="bi bi-geo-alt-fill me-1"></i>
+                            {{ offer.location|default:"Non spécifié" }}
+                        </span>
+                    </div>
+
+                    <h5 class="mb-3">Description du poste</h5>
+                    <p style="white-space: pre-wrap;">{{ offer.description }}</p>
+
+            
+                    {% if offer.required_skills.all %}
+                        <h5 class="mt-4 mb-3">Compétences requises</h5>
+                        <div>
+                            {% for skill in offer.required_skills.all %}
+                                <span class="badge bg-light text-dark border border-light-subtle rounded-pill me-1 mb-1">{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <hr class="my-4">
+                    <div class="text-center">
+                        <a href="#" class="btn btn-primary btn-lg">
+                            <i class="bi bi-send-check-fill me-2"></i>
+                            Postuler à cette offre
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

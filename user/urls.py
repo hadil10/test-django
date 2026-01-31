@@ -1,31 +1,41 @@
 # user/urls.py
 
-from django.urls import path, include
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from .views import SignUpView, user_redirect_view
 
-# --- IMPORTS CORRIGÉS ---
-
-# 1. On importe la vue d'inscription de l'étudiant depuis le fichier local 'user/views.py'.
-from .views import SignUpView
-
-# 2. On importe les vues pour l'inscription de l'entreprise en utilisant leurs VRAIS NOMS (en snake_case).
-from companies.views import company_signup_view, company_signup_success_view
-
-# 3. On importe la vue de redirection depuis l'application 'profiles'.
-from profiles.views import redirect_on_login_view
-
+# Le namespace est défini dans config/urls.py, mais app_name est une bonne pratique.
 app_name = 'user'
 
 urlpatterns = [
-    # URL pour l'inscription de l'étudiant (c'est une classe, donc on utilise .as_view())
-    path('signup/student/', SignUpView.as_view(), name='student-signup'),
-    
-    # URLs pour l'inscription de l'entreprise (ce sont des fonctions, donc on n'utilise PAS .as_view())
-    path('signup/company/', company_signup_view, name='company-signup'),
-    path('signup/company/success/', company_signup_success_view, name='company-signup-success'),
+    # URL pour l'inscription
+    path('signup/', SignUpView.as_view(), name='signup'),
     
     # URL pour la redirection après connexion
-    path('redirect/', redirect_on_login_view, name='login-redirect'),
+    path('redirect/', user_redirect_view, name='login-redirect'),
+
+    # URLs d'authentification fournies par Django
+    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     
-    # Inclut toutes les URLs d'authentification par défaut de Django
-    path('', include('django.contrib.auth.urls')),
+    path(
+        'password_reset/', 
+        auth_views.PasswordResetView.as_view(template_name='registration/password_reset_form.html', success_url='done/'), 
+        name='password_reset'
+    ),
+    path(
+        'password_reset/done/', 
+        auth_views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), 
+        name='password_reset_done'
+    ),
+    path(
+        'reset/<uidb64>/<token>/', 
+        auth_views.PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html', success_url='/accounts/reset/done/'), 
+        name='password_reset_confirm'
+    ),
+    path(
+        'reset/done/', 
+        auth_views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'), 
+        name='password_reset_complete'
+    ),
 ]

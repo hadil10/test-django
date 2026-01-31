@@ -134,8 +134,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'user.CustomUser'
 LOGIN_REDIRECT_URL = 'user:login-redirect'
 LOGIN_URL = 'user:login'
-LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'profiles:home'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 MEDIA8_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR/ 'media'
+
+# =======================================================
+# CONFIGURATION POUR L'ENVOI D'E-MAILS (via Gmail)
+# =======================================================
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

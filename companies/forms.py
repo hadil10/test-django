@@ -1,49 +1,66 @@
 from django import forms
-from user.models import CustomUser
-from .models import Company
-from profiles.models import Job
-
-
-
-class CompanyUserForm(forms.ModelForm):
-    """
-    Formulaire pour les informations de l'utilisateur (la personne de contact).
-    """
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
-
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'email', 'password']
-
-    def clean_confirm_password(self):
-        password = self.cleaned_data.get('password')
-        confirm_password = self.cleaned_data.get('confirm_password')
-        if password and confirm_password and password != confirm_password:
-            raise forms.ValidationError("Les mots de passe ne correspondent pas.")
-        return confirm_password
+from .models import Company, JobOffer
+from profiles.models import Skill
 
 class CompanyProfileForm(forms.ModelForm):
-    """
-    Formulaire pour les informations du profil de l'entreprise.
-    """
     class Meta:
         model = Company
-        fields = ['name', 'website', 'description']
-        # On exclut 'user', 'is_approved' et 'logo' qui seront gérés automatiquement.
-class JobForm(forms.ModelForm):
-    """
-    Formulaire pour créer ou modifier une fiche de poste.
-    """
-    class Meta:
-        model = Job
-        fields = [
-            'title', 'description', 'salary_min', 'salary_max',
-            'required_skills', 'relevant_interests'
-        ]
-        # On exclut 'company' qui sera ajouté automatiquement depuis la vue.
-        
+        fields = ['name', 'description', 'website', 'industry', 'logo']
+        labels = {
+            'name': "Nom de l'entreprise",
+            'description': "Description de l'entreprise",
+            'website': "Site web",
+            'industry': "Secteur d'activité",
+            'logo': "Logo",
+        }
         widgets = {
-            'required_skills': forms.CheckboxSelectMultiple,
-            'relevant_interests': forms.CheckboxSelectMultiple,
+            'description': forms.Textarea(attrs={'rows': 4}),
+        }
+class JobOfferForm(forms.ModelForm):
+    required_skills = forms.CharField(
+        label="Compétences requises (séparées par des virgules)",
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Ex: Python, Gestion de projet, SEO'}),
+        help_text="Entrez les compétences nécessaires, séparées par une virgule."
+    )
+    class Meta:
+        model = JobOffer
+       
+        fields = ['title', 'description', 'job_type', 'location', 'is_active']
+       
+        labels = {
+            'title': "Titre du poste",
+            'description': "Description détaillée du poste et des missions",
+            'job_type': "Type de contrat",
+            'location': "Lieu (Ville, Pays)",
+            'is_active': "Publier cette offre (la rendre visible aux étudiants)",
+             
+        }
+        exclude =['required_skills']
+      
+
+    def __init__(self, *args, **kwargs):
+        """
+        Le constructeur standard et robuste pour un formulaire personnalisé.
+        """
+        request = kwargs.pop('request', None)
+
+        super(JobOfferForm, self).__init__(*args, **kwargs)
+
+        if request and hasattr(request.user, 'company_profile'):
+            pass
+
+    class Meta:
+        model = JobOffer
+        # On exclut 'company' car on l'ajoutera manuellement dans la vue.
+        fields = ['title', 'description', 'offer_type', 'location', 'required_skills', 'is_active']
+        labels = {
+            'title': "Titre du poste",
+            'description': "Description détaillée du poste",
+            'offer_type': "Type de contrat",
+            'location': "Lieu (Ville, Pays)",
+            'is_active': "Rendre cette offre visible publiquement",
+        }
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 6}),
         }
