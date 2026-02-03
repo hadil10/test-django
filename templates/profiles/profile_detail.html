@@ -3,7 +3,7 @@
 {% block title %}Profil de {{ profile.user.username }}{% endblock %}
 
 {% block content %}
-  
+    <!-- En-tête de la page de profil -->
     <header class="py-5 text-center text-white" style="background: linear-gradient(120deg, #6f42c1, #a98eda);">
         <div class="container">
             <h1 class="fw-bold">Profil de {{ profile.user.username }}</h1>
@@ -15,85 +15,123 @@
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 
-              
+                <!-- Section des boutons d'action, visible uniquement par le propriétaire du profil -->
+                {% if user == profile.user %}
                 <div class="card shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Biographie</h5>
-                        <p class="card-text">{{ profile.bio|default:"Aucune biographie pour le moment."|linebreaks }}</p>
+                    <div class="card-header bg-light fw-bold">Actions Rapides</div>
+                    <div class="card-body text-center p-3">
+                        <a href="{% url 'profiles:profile-update' %}" class="btn btn-primary">Modifier le profil</a>
+                        <a href="{% url 'profiles:add-academic-result' %}" class="btn btn-info ms-2">Gérer mes résultats</a>
+                        <a href="{% url 'profiles:questionnaire' %}" class="btn btn-secondary ms-2">Évaluer mes compétences & Intérêts</a>
                     </div>
-                   
-                    <!-- ======================================================= -->
-                    <!-- SECTION DES BOUTONS D'ACTION (AVEC LOGIQUE D'AFFICHAGE) -->
-                    <!-- ======================================================= -->
-                    {% if user == profile.user %}
-                        <div class="card-footer bg-light text-center p-3">
-                            <a href="{% url 'profiles:profile-update' %}" class="btn btn-primary">Modifier le profil</a>
-                            
-                            
-                            <a href="{% url 'profiles:add-academic-result' %}" class="btn btn-info ms-2">Gérer mes résultats</a>
-                            
-                            <a href="{% url 'profiles:questionnaire' %}" class="btn btn-secondary ms-2">Évaluer mes compétences & Intérêts</a>
-                        </div>
-                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Carte des informations clés (Niveau d'études, Lieu, Bio, CV) -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light fw-bold">Informations Clés</div>
+                    <div class="card-body p-4">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item px-0">
+                                <strong>Niveau d'études :</strong>
+                                <span class="text-primary fw-bold">{{ profile.education_level|default:"Non spécifié" }}</span>
+                            </li>
+                            <li class="list-group-item px-0">
+                                <strong>Lieu de travail souhaité :</strong>
+                                <span class="text-primary fw-bold">{{ profile.location_preference|default:"Non spécifié" }}</span>
+                            </li>
+                            <li class="list-group-item px-0">
+                                <strong>Biographie :</strong>
+                                <p class="mt-2">{{ profile.bio|default:"Aucune biographie pour le moment."|linebreaks }}</p>
+                            </li>
+                            <li class="list-group-item px-0">
+                                <strong>Curriculum Vitae (CV) :</strong>
+                                {% if profile.cv %}
+                                    <p class="mt-2">
+                                        <a href="{{ profile.cv.url }}" class="btn btn-outline-primary" target="_blank">
+                                            <i class="bi bi-file-earmark-person-fill me-2"></i>
+                                            Télécharger le CV
+                                        </a>
+                                    </p>
+                                {% else %}
+                                    <p class="text-muted mt-2">Aucun CV n'a été téléchargé.</p>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
-
+                <!-- Carte des compétences avec barres de progression colorées -->
                 <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light fw-bold">
+                        <i class="bi bi-tools me-2"></i>Compétences
+                    </div>
                     <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Curriculum Vitae</h5>
-                        {% if profile.cv %}
-                            <p>
-                                <a href="{{ profile.cv.url }}" class="btn btn-outline-primary" target="_blank">
-                                    <i class="bi bi-file-earmark-person-fill me-2"></i>
-                                    Voir le CV
-                                </a>
-                            </p>
-                            {% if user == profile.user %}
-                                <small class="text-muted">
-                                    Pour mettre à jour votre CV, veuillez en téléverser un nouveau via le formulaire de modification.
-                                </small>
-                            {% endif %}
+                        {% if profile.skill_evaluations.all %}
+                            {% for evaluation in profile.skill_evaluations.all %}
+                                <div class="mb-3">
+                                    <strong>{{ evaluation.skill.name }}</strong>
+                                    <div class="progress mt-1" style="height: 20px; font-size: 0.8rem;">
+                                        
+                                        {% with level=evaluation.level %}
+                                            {% if level == 1 %}{% with color='danger' %}{% endwith %}{% endif %}
+                                            {% if level == 2 %}{% with color='warning' %}{% endwith %}{% endif %}
+                                            {% if level == 3 %}{% with color='info' %}{% endwith %}{% endif %}
+                                            {% if level == 4 %}{% with color='primary' %}{% endwith %}{% endif %}
+                                            {% if level == 5 %}{% with color='success' %}{% endwith %}{% endif %}
+
+                                            <div class="progress-bar progress-bar-striped bg-{{ color|default:'secondary' }}" 
+                                                 role="progressbar" 
+                                                 style="width: {% widthratio level 5 100 %}%" 
+                                                 aria-valuenow="{{ level }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="5">
+                                                {{ evaluation.get_level_display }}
+                                            </div>
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            {% endfor %}
                         {% else %}
-                            <p class="text-muted">Aucun CV n'a été téléchargé.</p>
-                            {% if user == profile.user %}
-                                <a href="{% url 'profiles:profile-update' %}" class="btn btn-primary">Ajouter mon CV</a>
-                            {% endif %}
+                            <p class="text-muted">Aucune compétence n'a encore été évaluée.</p>
                         {% endif %}
                     </div>
                 </div>
 
-              
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Auto-évaluation des compétences</h5>
-                        {% for evaluation in profile.skill_evaluations.all %}
-                            <div class="mb-3">
-                                <strong>{{ evaluation.skill.name }}:</strong>
-                                <span class="text-primary fw-bold">{{ evaluation.get_level_display }}</span>
-                               <div class="progress mt-1" style="height: 10px;">
-                                   <div class="progress-bar" role="progressbar" style="width: {% widthratio evaluation.level 5 100 %}%" aria-valuenow="{{ evaluation.level }}" aria-valuemin="0" aria-valuemax="5"></div>
-                               </div>
-                            </div>
-                        {% empty %}
-                            <p class="text-muted">Aucune compétence n'a encore été évaluée.</p>
-                        {% endfor %}
-                    </div>
-                </div>
-
+                <!-- Carte des centres d'intérêt avec barres de progression colorées -->
                 <div class="card shadow-sm">
+                    <div class="card-header bg-light fw-bold">
+                        <i class="bi bi-heart-fill me-2"></i>Centres d'Intérêt
+                    </div>
                     <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Évaluation des centres d'intérêt</h5>
-                        {% for evaluation in profile.interest_evaluations.all %}
-                            <div class="mb-3">
-                                <strong>{{ evaluation.interest.name }}:</strong>
-                                <span class="text-success fw-bold">{{ evaluation.get_level_display }}</span>  
-                                <div class="progress mt-1" style="height: 10px;">
-                                    <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio evaluation.level 5 100 %}%" aria-valuenow="{{ evaluation.level }}" aria-valuemin="0" aria-valuemax="5"></div>
+                        {% if profile.interest_evaluations.all %}
+                            {% for evaluation in profile.interest_evaluations.all %}
+                                <div class="mb-3">
+                                    <strong>{{ evaluation.interest.name }}</strong>
+                                    <div class="progress mt-1" style="height: 20px; font-size: 0.8rem;">
+
+                                        {% with level=evaluation.level %}
+                                            {% if level == 1 %}{% with color='danger' %}{% endwith %}{% endif %}
+                                            {% if level == 2 %}{% with color='warning' %}{% endwith %}{% endif %}
+                                            {% if level == 3 %}{% with color='info' %}{% endwith %}{% endif %}
+                                            {% if level == 4 %}{% with color='primary' %}{% endwith %}{% endif %}
+                                            {% if level == 5 %}{% with color='success' %}{% endwith %}{% endif %}
+
+                                            <div class="progress-bar progress-bar-striped bg-{{ color|default:'secondary' }}" 
+                                                 role="progressbar" 
+                                                 style="width: {% widthratio level 5 100 %}%" 
+                                                 aria-valuenow="{{ level }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="5">
+                                                {{ evaluation.get_level_display }}
+                                            </div>
+                                        {% endwith %}
+                                    </div>
                                 </div>
-                            </div>
-                        {% empty %}
+                            {% endfor %}
+                        {% else %}
                             <p class="text-muted">Aucun centre d'intérêt n'a encore été évalué.</p>
-                        {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
 

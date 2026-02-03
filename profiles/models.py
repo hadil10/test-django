@@ -40,9 +40,19 @@ class Profile(models.Model):
     cv = models.FileField(upload_to='cvs/', blank=True, null=True, verbose_name="curriculum vitae (CV)", help_text="Téléchargez votre CV au format PDF.", validators=[validate_file_extension])
     skills = models.ManyToManyField(Skill, blank=True, related_name="profiles")
     interests = models.ManyToManyField(Interest, blank=True, related_name="profiles")
-    # On peut ajouter un lien vers les formations suivies par l'étudiant
-    formations = models.ManyToManyField(Formation, blank=True, related_name="students", verbose_name="Formations suivies")
-
+    location_preference = models.CharField(
+        max_length=150, 
+        blank=True, 
+        verbose_name="Lieu de travail souhaité",
+        help_text="Ex: Paris, France ou 'Télétravail'"
+    )
+    education_level = models.CharField(
+        max_length=50, 
+        blank=True, 
+        verbose_name="Niveau d'études actuel/obtenu",
+        help_text="Ex: Bac+3, Master, Doctorat"
+    )
+    
     def __str__(self):
         return f"Profil de {self.user.username}"
 
