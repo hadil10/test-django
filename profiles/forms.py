@@ -1,24 +1,24 @@
 from django import forms
 from .models import Profile, Skill, Interest, AcademicResult
 
-
+# --- FORMULAIRE : ProfileUpdateForm ---
 class ProfileUpdateForm(forms.ModelForm):
     """
     Formulaire pour mettre à jour le profil d'un utilisateur,
     y compris la biographie, le CV et les relations ManyToMany.
     """
-    skills = forms.CharField(
-        label="Mes compétences (séparées par des virgules)",
+    skills = forms.ModelMultipleChoiceField(
+        queryset=Skill.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Ex: Python, Gestion de projet, Design UX'}),
-        help_text="Entrez vos compétences, même si elles sont nouvelles."
+        label="Mes compétences"
     )
     
-    interests = forms.CharField(
-        label="Mes centres d'intérêt (séparés par des virgules)",
+    interests = forms.ModelMultipleChoiceField(
+        queryset=Interest.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Ex: Intelligence Artificielle, Écologie, Jeux vidéo'}),
-        help_text="Entrez vos centres d'intérêt, séparés par une virgule."
+        label="Mes centres d'intérêt"
     )
 
     delete_cv = forms.BooleanField(
@@ -28,12 +28,10 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ['bio', 'cv', 'location_preference', 'education_level']
+        fields = ['bio', 'cv', 'skills', 'interests']
         labels = {
-            'bio': "Biographie",
-            'cv': "Mettre à jour mon CV",
-            'location_preference': "Lieu de travail souhaité",
-            'education_level': "Niveau d'études",
+            'bio': 'Ma biographie',
+            'cv': 'Mon CV (format PDF, DOCX)',
         }
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 4}),

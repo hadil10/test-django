@@ -1,5 +1,6 @@
 from django import forms
 from .models import Company, JobOffer
+from profiles.models import Skill
 
 class CompanyProfileForm(forms.ModelForm):
     class Meta:
@@ -7,15 +8,14 @@ class CompanyProfileForm(forms.ModelForm):
         fields = ['name', 'description', 'website', 'industry', 'logo']
         labels = {
             'name': "Nom de l'entreprise",
-            'description': "Description de votre entreprise",
-            'website': "Site web officiel",
+            'description': "Description de l'entreprise",
+            'website': "Site web",
             'industry': "Secteur d'activité",
-            'logo': "Logo de l'entreprise",
+            'logo': "Logo",
         }
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
-
 class JobOfferForm(forms.ModelForm):
     required_skills = forms.CharField(
         label="Compétences requises (séparées par des virgules)",
@@ -23,26 +23,43 @@ class JobOfferForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'placeholder': 'Ex: Python, Gestion de projet, SEO'}),
         help_text="Entrez les compétences nécessaires, séparées par une virgule."
     )
-
     class Meta:
         model = JobOffer
-        
-        fields = [
-            'title', 
-            'description', 
-            'offer_type', 
-            'location', 
-            'is_active', 
-            'required_education_level'
-        ]
-        
+       
+        fields = ['title', 'description', 'job_type', 'location', 'is_active']
+       
         labels = {
             'title': "Titre du poste",
             'description': "Description détaillée du poste et des missions",
-            'offer_type': "Type de contrat", # <-- NOM CORRECT ICI AUSSI
+            'job_type': "Type de contrat",
             'location': "Lieu (Ville, Pays)",
             'is_active': "Publier cette offre (la rendre visible aux étudiants)",
-            'required_education_level': "Niveau d'études minimum requis",
+             
+        }
+        exclude =['required_skills']
+      
+
+    def __init__(self, *args, **kwargs):
+        """
+        Le constructeur standard et robuste pour un formulaire personnalisé.
+        """
+        request = kwargs.pop('request', None)
+
+        super(JobOfferForm, self).__init__(*args, **kwargs)
+
+        if request and hasattr(request.user, 'company_profile'):
+            pass
+
+    class Meta:
+        model = JobOffer
+        # On exclut 'company' car on l'ajoutera manuellement dans la vue.
+        fields = ['title', 'description', 'offer_type', 'location', 'required_skills', 'is_active']
+        labels = {
+            'title': "Titre du poste",
+            'description': "Description détaillée du poste",
+            'offer_type': "Type de contrat",
+            'location': "Lieu (Ville, Pays)",
+            'is_active': "Rendre cette offre visible publiquement",
         }
         widgets = {
             'description': forms.Textarea(attrs={'rows': 6}),

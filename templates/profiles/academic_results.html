@@ -7,56 +7,54 @@
 <div class="container my-5">
     <div class="row">
 
-        <div class="col-md-8 mx-auto" >
-            <div class="card shadow-sm mb-4">
-                <div class="card-header">
-                    <h3 class="mb-0">Ajouter un Résultat Académique</h3>
-                </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
                 <div class="card-body">
+                    <h4 class="card-title">Ajouter un Résultat</h4>
 
-                    <form method="post" action="{% url 'profiles:add-academic-result' %}" novalidate>
+                    <form method="post" action="{% url 'profiles:academic-results' %}">
                         {% csrf_token %}
                         {{ form|crispy }}
-                        <div class="d-grid mt-3">
-                            <button type="submit" class="btn btn-primary">Ajouter le résultat</button>
-                        </div>
+                        <button type="submit" class="btn btn-primary mt-3 w-100">Ajouter</button>
                     </form>
                 </div>
             </div>
-
-     <div class="card shadow-sm">
-                <div class="card-header">
-                    <h3 class="mb-0">Mes Résultats Enregistrés</h3>
+        </div>
+        <div class="col-md-8">
+            <h2>Mes Résultats Enregistrés</h2>
+            <hr>
+            {% if results %}
+                <ul class="list-group">
+                    {% for result in results %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="d-block">{{ result.subject }}</strong>
+                                <small class="text-muted">Année {{ result.year }}</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                
+                                <span class="badge bg-primary rounded-pill fs-6 me-3">{{ result.grade }}</span>
+                                <a href="{% url 'profiles:academic-result-update' result.id %}" class="btn btn-sm btn-outline-primary border-0 me-1" title="Modifier ce résultat">
+                                    <i class="bi bi-pencil-fill"></i> 
+                                </a>    
+                                <form method="post" action="{% url 'profiles:academic-result-delete' result.id %}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce résultat ?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Supprimer ce résultat">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="alert alert-info">
+                    Vous n'avez encore ajouté aucun résultat académique.
                 </div>
-                <div class="card-body p-0">
-                    {% if results %}
-                        <ul class="list-group list-group-flush">
-                            {% for result in results %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>{{ result.subject }}</strong> ({{ result.year }})
-                                          
-
-                                        <span class="text-muted">Note : {{ result.grade }}</span>
-                                    </div>
-                                    <div>
-                                        <a href="{% url 'profiles:update-academic-result' result.id %}" class="btn btn-secondary btn-sm">Modifier</a>
-                                        <!-- Formulaire pour la suppression sécurisée -->
-                                        <form action="{% url 'profiles:delete-academic-result' result.id %}" method="post" class="d-inline">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-                                        </form>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-center p-4 text-muted">Vous n'avez pas encore ajouté de résultats académiques.</p>
-                    {% endif %}
-                </div>
-            </div>
-
+            {% endif %}
+            
+            <a href="{% url 'profiles:profile' %}" class="btn btn-secondary mt-4">Retour au profil</a>
         </div>
     </div>
-</div>                        
+</div>
 {% endblock %}

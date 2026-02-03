@@ -57,59 +57,69 @@ def offer_applicants_view(request, offer_id):
 # =======================================================
 # GESTION DES OFFRES D'EMPLOI (Création)
 # =======================================================
-@login_required
+@company_required
 def create_job_offer(request):
-    if request.user.user_type != 'company':
-        return redirect('profiles:home')
     company_profile = get_object_or_404(Company, user=request.user)
-
     if request.method == 'POST':
         form = JobOfferForm(request.POST)
         if form.is_valid():
-            new_offer = form.save(commit=False)
-            new_offer.company = company_profile
-            new_offer.save()
-            
-            skills_str = request.POST.get('required_skills', '')
+           
+            job_offer = form.save(commit=False)
+            job_offer.company = company_profile
+            job_offer.save()
+
+            # gère les compétences manuellement 
+            skills_str = form.cleaned_data.get('required_skills', '')
             skill_names = [name.strip() for name in skills_str.split(',') if name.strip()]
             
-            new_offer.required_skills.clear()
+            job_offer.required_skills.clear() 
             for name in skill_names:
-                skill, created = Skill.objects.get_or_create(name__iexact=name.lower())
-                new_offer.required_skills.add(skill)
-            messages.success(request, "L'offre d'emploi a été créée avec succès (compétences non traitées).")
+                skill, created = Skill.objects.get_or_create(name__iexact=name.lower()) 
+                job_offer.required_skills.add(skill)
+
+            messages.success(request, "L'offre d'emploi a été créée avec succès.")
             return redirect('companies:dashboard')
     else:
         form = JobOfferForm()
+
     context = {'form': form, 'form_title': "Créer une nouvelle offre"}
     return render(request, 'companies/job_offer_form.html', context)
 
 
-@login_required
+# =======================================================
+# MODIFIER UNE OFFRE D'EMPLOI
+# =======================================================
+@company_required
 def update_job_offer(request, offer_id):
-    if request.user.user_type != 'company':
-        return redirect('profiles:home')
     offer = get_object_or_404(JobOffer, id=offer_id, company__user=request.user)
-
+    
     if request.method == 'POST':
         form = JobOfferForm(request.POST, instance=offer)
         if form.is_valid():
-            updated_offer = form.save()
             
-            skills_str = request.POST.get('required_skills', '')
+            updated_offer = form.save(commit=False)
+            updated_offer.save()
+
+            #  gère les compétences manuellement
+            skills_str = form.cleaned_data.get('required_skills', '')
             skill_names = [name.strip() for name in skills_str.split(',') if name.strip()]
             
-            updated_offer.required_skills.clear()
+            updated_offer.required_skills.clear() 
             for name in skill_names:
                 skill, created = Skill.objects.get_or_create(name__iexact=name.lower())
                 updated_offer.required_skills.add(skill)
-            messages.success(request, "L'offre d'emploi a été mise à jour avec succès (compétences non traitées).")
+
+            messages.success(request, "L'offre d'emploi a été mise à jour avec succès.")
             return redirect('companies:dashboard')
     else:
-        skills_str = ", ".join([skill.name for skill in offer.required_skills.all()])
+        current_skills = offer.required_skills.all()
+        # On les transforme en une chaîne de caractères : "Python, Java, SEO"
+        skills_str = ", ".join([skill.name for skill in current_skills])
         form = JobOfferForm(instance=offer, initial={'required_skills': skills_str})
+
     context = {'form': form, 'form_title': f"Modifier l'offre : {offer.title}"}
     return render(request, 'companies/job_offer_form.html', context)
+# =======================================================
 # SUPPRIMER UNE OFFRE D'EMPLOI
 # =======================================================
 @company_required

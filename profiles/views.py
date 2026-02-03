@@ -27,46 +27,16 @@ def profile_view(request):
 @login_required
 def profile_update_view(request):
     profile = get_object_or_404(Profile, user=request.user)
-
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            # ... (sauvegarde du profil) ...
-
-            # Gestion des compétences
-            skills_str = form.cleaned_data.get('skills', '')
-            # LA CORRECTION EST ICI : on filtre les chaînes vides
-            skill_names = [name.strip() for name in skills_str.split(',') if name.strip()]
-            
-            updated_profile.skills.clear()
-            for name in skill_names:
-                skill, created = Skill.objects.get_or_create(name__iexact=name.lower())
-                updated_profile.skills.add(skill)
-
-            # Gestion des centres d'intérêt
-            interests_str = form.cleaned_data.get('interests', '')
-            # LA CORRECTION EST ICI : on filtre les chaînes vides
-            interest_names = [name.strip() for name in interests_str.split(',') if name.strip()]
-
-            updated_profile.interests.clear()
-            for name in interest_names:
-                interest, created = Interest.objects.get_or_create(name__iexact=name.lower())
-                updated_profile.interests.add(interest)
+            form.save() 
             messages.success(request, 'Votre profil a été mis à jour avec succès !')
-            return redirect('profiles:profile-detail')
+            return redirect('profiles:profile-detail') # Utiliser le nom de l'URL est plus robuste
     else:
-        skills_str = ", ".join([skill.name for skill in profile.skills.all()])
-      
-        interests_str = ", ".join([interest.name for interest in profile.interests.all()])
-        
-        form = ProfileUpdateForm(
-            instance=profile, 
-            initial={'skills': skills_str, 'interests': interests_str}
-        )
-
+        form = ProfileUpdateForm(instance=profile)
     context = {'form': form}
     return render(request, 'profiles/profile_form.html', context)
-
 
 
 @login_required

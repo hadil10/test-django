@@ -66,12 +66,6 @@ class JobOffer(models.Model):
         blank=True,
         verbose_name="Compétences requises"
     )
-    required_education_level = models.CharField(
-        max_length=50, 
-        blank=True, 
-        verbose_name="Niveau d'études minimum requis",
-        help_text="Ex: Bac+3, Master, Certification"
-    )
     is_active = models.BooleanField(default=True, verbose_name="Offre active")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
